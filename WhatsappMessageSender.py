@@ -8,7 +8,7 @@ current_hour = now.hour
 current_minute = now.minute
 
 # Add a small delay (e.g., 2 seconds)
-current_minute += 0.1  # Adjust the minute by adding 1 minute, or you can use current time + few seconds
+current_minute += 1  # Adjust the minute by adding 1 minute, or you can use current time + few seconds
 
 # Phone number and message
 phone_number = input("recipient's phone number (including country code and + sign) ")
