@@ -12,7 +12,7 @@ current_minute += 0.1  # Adjust the minute by adding 1 minute, or you can use cu
 
 # Phone number and message
 phone_number = input("recipient's phone number (including country code and + sign) ")
-message = "Hello, this is an instant message from Python!"
+message = input("What shall we send, sir? ")
 
 # Send the message
 sendRepeat = int(input("How many times? "))
