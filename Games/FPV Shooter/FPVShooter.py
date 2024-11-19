@@ -47,7 +47,7 @@ def shoot():
     global ammo_count
     if ammo_count > 0:
         bullet = Entity(
-            model='cube',
+            model='sphere',
             color=color.red,
             scale=(0.2, 0.2, 0.2),
             position=player.camera.world_position + player.camera.forward * 2,
@@ -123,11 +123,6 @@ def input(key):
         activate_power_up()
     elif key == 'escape':  # Press 'ESC' to quit
         application.quit()
-
-# Weapon Types
-def weapon_switcher():
-    # Placeholder: Add weapon switching logic here
-    pass
 
 # Run the game
 app.run()
