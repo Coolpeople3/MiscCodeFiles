@@ -23,15 +23,22 @@ ground = Entity(model='plane', scale=(100, 1, 100), texture='white_cube', textur
 Sky(texture='sky_default')
 
 # Add walls and houses for cover
-for _ in range(10):
-    x = random.randint(-40, 40)
-    z = random.randint(-40, 40)
-    Entity(model='cube', color=color.brown, position=(x, 1, z), scale=(3, 3, 3), collider='box')
+walls = []
+houses = []
 
+# Add walls in the game world
 for _ in range(5):
+    x = random.randint(-30, 30)
+    z = random.randint(-30, 30)
+    wall = Entity(model='cube', color=color.brown, position=(x, 1, z), scale=(5, 3, 1), collider='box')
+    walls.append(wall)
+
+# Add houses in the game world
+for _ in range(3):
     x = random.randint(-40, 40)
     z = random.randint(-40, 40)
-    Entity(model='cube', color=color.gray, position=(x, 1, z), scale=(8, 5, 8), collider='box')
+    house = Entity(model='cube', color=color.gray, position=(x, 1, z), scale=(8, 5, 8), collider='box')
+    houses.append(house)
 
 # Player setup
 player = FirstPersonController()
