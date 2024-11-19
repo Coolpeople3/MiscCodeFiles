@@ -123,6 +123,8 @@ def input(key):
         activate_power_up()
     elif key == 'escape':  # Press 'ESC' to quit
         application.quit()
+    elif key == 'left mouse down':
+        pass  # Disable the left mouse default action
 
 # Run the game
 app.run()
