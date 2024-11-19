@@ -15,12 +15,23 @@ healing_boxes = []
 enemies_alive = 5
 current_wave = 1
 max_waves = 3
-damage_cooldown = 0.5  # Time between taking damage
-healing_amount = 20  # Amount of health the healing box restores
+damage_cooldown = 0.5
+healing_amount = 20
 
 # Setup the game world
 ground = Entity(model='plane', scale=(100, 1, 100), texture='white_cube', texture_scale=(50, 50), collider='box')
 Sky(texture='sky_default')
+
+# Add walls and houses for cover
+for _ in range(10):
+    x = random.randint(-40, 40)
+    z = random.randint(-40, 40)
+    Entity(model='cube', color=color.brown, position=(x, 1, z), scale=(3, 3, 3), collider='box')
+
+for _ in range(5):
+    x = random.randint(-40, 40)
+    z = random.randint(-40, 40)
+    Entity(model='cube', color=color.gray, position=(x, 1, z), scale=(8, 5, 8), collider='box')
 
 # Player setup
 player = FirstPersonController()
@@ -68,10 +79,10 @@ def shoot():
             model='sphere',
             color=color.red,
             scale=(0.2, 0.2, 0.2),
-            position=player.position + (0, 1.5, 0),
+            position=player.position + Vec3(0, 1.5, 0),
             collider='box',
         )
-        bullet.animate_position(bullet.position + (player.forward * 50), duration=1, curve=curve.linear)
+        bullet.animate_position(bullet.position + player.forward * 50, duration=1, curve=curve.linear)
         bullets.append(bullet)
         ammo_count -= 1
         ammo_display.text = f"Ammo: {ammo_count}"
