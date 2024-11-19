@@ -11,6 +11,7 @@ player_health = 100
 player_score = 0
 enemies = []
 bullets = []
+ammo_boxes = []
 enemies_alive = 5
 current_wave = 1
 max_waves = 3
@@ -42,6 +43,26 @@ def spawn_enemies(wave):
         enemies.append(enemy)
 
 spawn_enemies(current_wave)
+
+# Ammo Box setup
+def spawn_ammo_box():
+    """Spawns a hovering ammo box at a random location."""
+    x = random.randint(-10, 10)
+    z = random.randint(-10, 10)
+    ammo_box = Entity(
+        model='cube',
+        color=color.green,
+        position=(x, 1.5, z),
+        scale=(0.5, 0.5, 0.5),
+        collider='box'
+    )
+    ammo_box.animate_position(ammo_box.position + Vec3(0, 0.5, 0), duration=1, curve=curve.linear, loop=True)
+    ammo_box.animate_rotation((0, 360, 0), duration=2, curve=curve.linear, loop=True)
+    ammo_boxes.append(ammo_box)
+
+# Spawn some initial ammo boxes
+for _ in range(3):
+    spawn_ammo_box()
 
 # Shooting mechanics
 def shoot():
@@ -92,7 +113,7 @@ def activate_power_up():
 last_damage_time = time.time()
 
 def update():
-    global player_health, enemies, bullets, enemies_alive, current_wave, player_score, last_damage_time
+    global player_health, enemies, bullets, ammo_boxes, enemies_alive, current_wave, player_score, last_damage_time
 
     # Enemy AI: Move toward the player
     for enemy in enemies:
@@ -126,6 +147,14 @@ def update():
                     Text("You Win!", scale=3, origin=(0, 0), background=True)
                     application.pause()
             destroy(bullet)
+
+    # Check if player touches an ammo box
+    for ammo_box in ammo_boxes:
+        if distance(ammo_box, player) < 2:
+            ammo_count += 5
+            ammo_display.text = f"Ammo: {ammo_count}"
+            destroy(ammo_box)
+            ammo_boxes.remove(ammo_box)
 
 # Input handling
 def input(key):
