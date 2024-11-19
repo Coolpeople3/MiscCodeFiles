@@ -8,9 +8,12 @@ app = Ursina()
 # Game Variables
 ammo_count = 10
 player_health = 100
+player_score = 0
 enemies = []
 bullets = []
 enemies_alive = 5
+current_wave = 1
+max_waves = 3
 power_up_cost = 20
 
 # Setup the game world
@@ -23,18 +26,21 @@ player = FirstPersonController()
 # UI Elements
 ammo_display = Text(f"Ammo: {ammo_count}", position=(-0.85, 0.45), scale=2, background=True)
 health_display = Text(f"Health: {player_health}", position=(-0.85, 0.4), scale=2, background=True)
-power_up_display = Text("", position=(-0.85, 0.35), scale=2, background=True)
+score_display = Text(f"Score: {player_score}", position=(-0.85, 0.35), scale=2, background=True)
+wave_display = Text(f"Wave: {current_wave}/{max_waves}", position=(-0.85, 0.3), scale=2, background=True)
+power_up_display = Text("", position=(-0.85, 0.25), scale=2, background=True)
 
 # Enemy setup
-def spawn_enemies():
-    global enemies
-    for i in range(enemies_alive):
+def spawn_enemies(wave):
+    global enemies, enemies_alive
+    enemies_alive = wave * 5  # More enemies per wave
+    for _ in range(enemies_alive):
         x = random.randint(-10, 10)
         z = random.randint(5, 25)
         enemy = Entity(model='cube', color=color.yellow, position=(x, 1, z), collider='box', scale=1.5)
         enemies.append(enemy)
 
-spawn_enemies()
+spawn_enemies(current_wave)
 
 # Shooting mechanics
 def shoot():
@@ -60,7 +66,7 @@ def reload():
 
 # Power-up mechanics
 def activate_power_up():
-    global ammo_count, power_up_cost
+    global ammo_count, player_score
     if ammo_count >= power_up_cost:
         ammo_count -= power_up_cost
         ammo_display.text = f"Ammo: {ammo_count}"
@@ -68,10 +74,12 @@ def activate_power_up():
             destroy(enemy)
         enemies.clear()
         power_up_display.text = "Power-Up Activated!"
+        player_score += 50 * enemies_alive
+        score_display.text = f"Score: {player_score}"
 
 # Update enemy behavior and player status
 def update():
-    global player_health, enemies, bullets, enemies_alive
+    global player_health, enemies, bullets, enemies_alive, current_wave, player_score
 
     # Enemy AI: Move toward the player
     for enemy in enemies:
@@ -94,14 +102,20 @@ def update():
                 enemies.remove(hit_entity)
                 destroy(hit_entity)
                 enemies_alive -= 1
-                if enemies_alive == 0:
+                player_score += 10
+                score_display.text = f"Score: {player_score}"
+                if enemies_alive == 0 and current_wave < max_waves:
+                    current_wave += 1
+                    wave_display.text = f"Wave: {current_wave}/{max_waves}"
+                    spawn_enemies(current_wave)
+                elif enemies_alive == 0 and current_wave == max_waves:
                     Text("You Win!", scale=3, origin=(0, 0), background=True)
                     application.pause()
             destroy(bullet)
 
 # Input handling
 def input(key):
-    if key == 'left mouse down':  # Left-click to shoot
+    if key == 'right mouse down':  # Right-click to shoot
         shoot()
     elif key == 'r':  # Press 'R' to reload
         reload()
@@ -109,6 +123,11 @@ def input(key):
         activate_power_up()
     elif key == 'escape':  # Press 'ESC' to quit
         application.quit()
+
+# Weapon Types
+def weapon_switcher():
+    # Placeholder: Add weapon switching logic here
+    pass
 
 # Run the game
 app.run()
