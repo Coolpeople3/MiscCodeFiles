@@ -122,7 +122,7 @@ def update():
 
 # Input handling
 def input(key):
-    if key == 'right mouse down':  # Right-click to shoot
+    if key == 'shift':  # Use Shift to shoot
         shoot()
     elif key == 'r':  # Press 'R' to reload
         reload()
@@ -130,8 +130,6 @@ def input(key):
         activate_power_up()
     elif key == 'escape':  # Press 'ESC' to quit
         application.quit()
-    elif key == 'left mouse down':
-        pass  # Disable the left mouse default action
 
 # Run the game
 app.run()
