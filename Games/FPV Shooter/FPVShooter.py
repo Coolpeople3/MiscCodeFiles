@@ -46,21 +46,28 @@ spawn_enemies(current_wave)
 # Shooting mechanics
 def shoot():
     global ammo_count
-    if ammo_count > 0:
-        bullet = Entity(
-            model='sphere',
-            color=color.red,
-            scale=(0.2, 0.2, 0.2),
-            position=player.camera.world_position + player.camera.forward * 2,
-            collider='box',
-        )
-        bullet.animate_position(bullet.position + (player.camera.forward * 20), duration=1, curve=curve.linear)
-        bullets.append(bullet)
-        ammo_count -= 1
-        ammo_display.text = f"Ammo: {ammo_count}"
+    try:
+        if ammo_count > 0:
+            # Create the bullet
+            bullet = Entity(
+                model='sphere',
+                color=color.red,
+                scale=(0.2, 0.2, 0.2),
+                position=player.camera.world_position + player.camera.forward * 2,
+                collider='box',
+            )
+            # Animate the bullet's movement
+            bullet.animate_position(bullet.position + (player.camera.forward * 20), duration=1, curve=curve.linear)
+            bullets.append(bullet)
+            ammo_count -= 1
+            ammo_display.text = f"Ammo: {ammo_count}"
 
-        # Destroy bullet after it travels
-        destroy(bullet, delay=1.5)
+            # Schedule destruction of the bullet
+            destroy(bullet, delay=1.5)
+        else:
+            print("No ammo left to shoot.")
+    except Exception as e:
+        print(f"Error in shoot function: {e}")
 
 # Reload mechanics
 def reload():
@@ -123,6 +130,7 @@ def update():
 # Input handling
 def input(key):
     if key == 'shift':  # Use Shift to shoot
+        print("Attempting to shoot...")
         shoot()
     elif key == 'r':  # Press 'R' to reload
         reload()
