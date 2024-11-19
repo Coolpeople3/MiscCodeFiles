@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fun Games Hub</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Fun Games Hub</h1>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#games">Games</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home">
+      <h2>Welcome Hitarth Games!</h2>
+      <p>Enjoy quick and fun games right here. Pick your favorite and start playing!</p>
+    </section>
+
+    <section id="games">
+      <h2>Our Games</h2>
+      <div class="game-grid">
+        <div class="game">
+          <h3>Clicker Game</h3>
+          <button onclick="startGame('clicker')">Play Now</button>
+        </div>
+        <div class="game">
+          <h3>Tic-Tac-Toe</h3>
+          <button onclick="startGame('ticTacToe')">Play Now</button>
+        </div>
+        <div class="game">
+          <h3>Memory Game</h3>
+          <button onclick="startGame('memory')">Play Now</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <h2>About Hitarth Games</h2>
+      <p>This is a simple game website made for fun. More games are on the way—stay tuned!</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Hitarth Games</p>
+  </footer>
+
+  <script src="JavaScript.js"></script>
+</body>
+</html>
 
