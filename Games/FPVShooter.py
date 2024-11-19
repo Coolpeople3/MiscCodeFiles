@@ -31,11 +31,10 @@ def shoot():
             model='cube',
             color=color.red,
             scale=(0.2, 0.2, 0.2),
-            position=player.camera.world_position,
+            position=player.camera.world_position + player.camera.forward * 2,
             collider='box',
-            add_to_scene_entities=False
         )
-        bullet.add_script(SmoothFollow(speed=10, target=mouse.world_point))
+        bullet.animate_position(bullet.position + (player.camera.forward * 20), duration=1, curve=curve.linear)
         bullets.append(bullet)
         ammo_count -= 1
         ammo_display.text = f"Ammo: {ammo_count}"
@@ -57,12 +56,12 @@ def update():
 
     # Check for bullet-enemy collision
     for bullet in bullets:
-        bullet.y += time.dt * 10
         if bullet.intersects().hit:
-            bullet.disable()
-            if bullet.intersects().entity in enemies:
-                enemies.remove(bullet.intersects().entity)
-                destroy(bullet.intersects().entity)
+            hit_entity = bullet.intersects().entity
+            if hit_entity in enemies:
+                enemies.remove(hit_entity)
+                destroy(hit_entity)
+            destroy(bullet)
 
     # End game condition
     if len(enemies) == 0:
@@ -71,10 +70,12 @@ def update():
 
 # Input handling
 def input(key):
-    if key == 'left mouse down':
+    if key == 'left mouse down':  # Left-click to shoot
         shoot()
-    if key == 'r':
+    elif key == 'r':  # Press 'R' to reload
         reload()
+    elif key == 'escape':  # Press 'ESC' to quit
+        application.quit()
 
 # Run the game
 app.run()
