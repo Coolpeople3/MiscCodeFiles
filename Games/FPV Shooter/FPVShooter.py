@@ -53,11 +53,11 @@ def shoot():
                 model='sphere',
                 color=color.red,
                 scale=(0.2, 0.2, 0.2),
-                position=player.camera.world_position + player.camera.forward * 2,
+                position=camera.world_position + camera.forward * 2,  # Use global `camera`
                 collider='box',
             )
             # Animate the bullet's movement
-            bullet.animate_position(bullet.position + (player.camera.forward * 20), duration=1, curve=curve.linear)
+            bullet.animate_position(bullet.position + (camera.forward * 20), duration=1, curve=curve.linear)
             bullets.append(bullet)
             ammo_count -= 1
             ammo_display.text = f"Ammo: {ammo_count}"
