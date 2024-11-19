@@ -48,7 +48,7 @@ def shoot():
     global ammo_count, bullets
     if ammo_count > 0:
         try:
-            # Create the bullet
+            # Create the bullet using the global camera object
             bullet = Entity(
                 model='sphere',
                 color=color.red,
