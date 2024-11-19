@@ -45,9 +45,9 @@ spawn_enemies(current_wave)
 
 # Shooting mechanics
 def shoot():
-    global ammo_count
-    try:
-        if ammo_count > 0:
+    global ammo_count, bullets
+    if ammo_count > 0:
+        try:
             # Create the bullet
             bullet = Entity(
                 model='sphere',
@@ -64,10 +64,10 @@ def shoot():
 
             # Schedule destruction of the bullet
             destroy(bullet, delay=1.5)
-        else:
-            print("No ammo left to shoot.")
-    except Exception as e:
-        print(f"Error in shoot function: {e}")
+        except Exception as e:
+            print(f"Error in shoot function: {e}")
+    else:
+        print("No ammo left!")
 
 # Reload mechanics
 def reload():
@@ -137,6 +137,7 @@ def input(key):
     elif key == 'p':  # Press 'P' to activate power-up
         activate_power_up()
     elif key == 'escape':  # Press 'ESC' to quit
+        print("Quitting game...")
         application.quit()
 
 # Run the game
