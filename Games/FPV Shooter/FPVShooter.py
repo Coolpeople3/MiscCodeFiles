@@ -121,7 +121,6 @@ def update():
     # Check if the player collides with a healing box
     for healing_box in healing_boxes:
         if distance(healing_box, player) < 1.5:
-            global player_health
             player_health += healing_amount
             player_health = min(player_health, 100)  # Cap health at 100
             health_display.text = f"Health: {player_health}"
@@ -130,7 +129,7 @@ def update():
 
 # Input handling
 def input(key):
-    if key == 'shift':  # Press 'Shift' to shoot
+    if key == 'left mouse down':  # Left-click to shoot
         shoot()
     elif key == 'r':  # Press 'R' to reload
         reload()
