@@ -15,6 +15,7 @@ enemies_alive = 5
 current_wave = 1
 max_waves = 3
 power_up_cost = 20
+damage_cooldown = 0.5  # Time between consecutive damage
 
 # Setup the game world
 ground = Entity(model='plane', scale=(50, 1, 50), texture='white_cube', texture_scale=(50, 50), collider='box')
@@ -58,6 +59,9 @@ def shoot():
         ammo_count -= 1
         ammo_display.text = f"Ammo: {ammo_count}"
 
+        # Destroy bullet after it travels
+        destroy(bullet, delay=1.5)
+
 # Reload mechanics
 def reload():
     global ammo_count
@@ -78,8 +82,10 @@ def activate_power_up():
         score_display.text = f"Score: {player_score}"
 
 # Update enemy behavior and player status
+last_damage_time = time.time()
+
 def update():
-    global player_health, enemies, bullets, enemies_alive, current_wave, player_score
+    global player_health, enemies, bullets, enemies_alive, current_wave, player_score, last_damage_time
 
     # Enemy AI: Move toward the player
     for enemy in enemies:
@@ -87,8 +93,9 @@ def update():
             enemy.position += (player.position - enemy.position).normalized() * time.dt * 2
 
         # Check if enemy hits player
-        if distance(enemy, player) < 1.5:
+        if distance(enemy, player) < 1.5 and time.time() - last_damage_time > damage_cooldown:
             player_health -= 1
+            last_damage_time = time.time()
             health_display.text = f"Health: {player_health}"
             if player_health <= 0:
                 Text("Game Over!", scale=3, origin=(0, 0), background=True)
