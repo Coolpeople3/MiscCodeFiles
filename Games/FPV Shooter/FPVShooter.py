@@ -11,15 +11,15 @@ player_health = 100
 player_score = 0
 enemies = []
 bullets = []
-ammo_boxes = []
+healing_boxes = []
 enemies_alive = 5
 current_wave = 1
 max_waves = 3
-power_up_cost = 20
-damage_cooldown = 0.5  # Time between consecutive damage
+damage_cooldown = 0.5  # Time between taking damage
+healing_amount = 20  # Amount of health the healing box restores
 
 # Setup the game world
-ground = Entity(model='plane', scale=(100, 1, 100), texture='white_cube', texture_scale=(100, 100), collider='box')
+ground = Entity(model='plane', scale=(100, 1, 100), texture='white_cube', texture_scale=(50, 50), collider='box')
 Sky(texture='sky_default')
 
 # Player setup
@@ -30,7 +30,6 @@ ammo_display = Text(f"Ammo: {ammo_count}", position=(-0.85, 0.45), scale=2, back
 health_display = Text(f"Health: {player_health}", position=(-0.85, 0.4), scale=2, background=True)
 score_display = Text(f"Score: {player_score}", position=(-0.85, 0.35), scale=2, background=True)
 wave_display = Text(f"Wave: {current_wave}/{max_waves}", position=(-0.85, 0.3), scale=2, background=True)
-power_up_display = Text("", position=(-0.85, 0.25), scale=2, background=True)
 
 # Enemy setup
 def spawn_enemies(wave):
@@ -38,71 +37,44 @@ def spawn_enemies(wave):
     enemies_alive = wave * 5  # More enemies per wave
     for _ in range(enemies_alive):
         x = random.randint(-40, 40)
-        z = random.randint(-40, 40)
+        z = random.randint(5, 90)
         enemy = Entity(model='cube', color=color.yellow, position=(x, 1, z), collider='box', scale=1.5)
         enemies.append(enemy)
 
 spawn_enemies(current_wave)
 
-# Ammo Box setup
-def spawn_ammo_box():
-    """Spawns a hovering ammo box at a random location."""
+# Healing box setup
+def spawn_healing_box():
     x = random.randint(-40, 40)
     z = random.randint(-40, 40)
-    ammo_box = Entity(
+    healing_box = Entity(
         model='cube',
         color=color.green,
-        position=(x, 1.5, z),
-        scale=(0.5, 0.5, 0.5),
-        collider='box'
+        position=(x, 1, z),
+        collider='box',
+        scale=(1, 1, 1),
     )
-    ammo_box.animate_position(ammo_box.position + Vec3(0, 0.5, 0), duration=1, curve=curve.linear, loop=True)
-    ammo_box.animate_rotation((0, 360, 0), duration=2, curve=curve.linear, loop=True)
-    ammo_boxes.append(ammo_box)
+    healing_boxes.append(healing_box)
 
-# Spawn some initial ammo boxes
+# Spawn some initial healing boxes
 for _ in range(5):
-    spawn_ammo_box()
-
-# Structures: Houses and Walls
-def create_houses_and_walls():
-    """Create random houses and walls in the game area."""
-    for _ in range(10):
-        # Create houses
-        x = random.randint(-40, 40)
-        z = random.randint(-40, 40)
-        house = Entity(model='cube', color=color.gray, position=(x, 2, z), scale=(4, 4, 4), collider='box')
-
-    for _ in range(20):
-        # Create walls
-        x = random.randint(-40, 40)
-        z = random.randint(-40, 40)
-        wall = Entity(model='cube', color=color.brown, position=(x, 1.5, z), scale=(6, 3, 0.5), collider='box')
-
-create_houses_and_walls()
+    spawn_healing_box()
 
 # Shooting mechanics
 def shoot():
-    global ammo_count, bullets
+    global ammo_count
     if ammo_count > 0:
-        try:
-            bullet = Entity(
-                model='sphere',
-                color=color.red,
-                scale=(0.2, 0.2, 0.2),
-                position=camera.world_position + camera.forward * 2,  # Use global `camera`
-                collider='box',
-            )
-            bullet.animate_position(bullet.position + (camera.forward * 20), duration=1, curve=curve.linear)
-            bullets.append(bullet)
-            ammo_count -= 1
-            ammo_display.text = f"Ammo: {ammo_count}"
-
-            destroy(bullet, delay=1.5)
-        except Exception as e:
-            print(f"Error in shoot function: {e}")
-    else:
-        print("No ammo left!")
+        bullet = Entity(
+            model='sphere',
+            color=color.red,
+            scale=(0.2, 0.2, 0.2),
+            position=player.position + (0, 1.5, 0),
+            collider='box',
+        )
+        bullet.animate_position(bullet.position + (player.forward * 50), duration=1, curve=curve.linear)
+        bullets.append(bullet)
+        ammo_count -= 1
+        ammo_display.text = f"Ammo: {ammo_count}"
 
 # Reload mechanics
 def reload():
@@ -110,24 +82,9 @@ def reload():
     ammo_count = 10
     ammo_display.text = f"Ammo: {ammo_count}"
 
-# Power-up mechanics
-def activate_power_up():
-    global ammo_count, player_score
-    if ammo_count >= power_up_cost:
-        ammo_count -= power_up_cost
-        ammo_display.text = f"Ammo: {ammo_count}"
-        for enemy in enemies:
-            destroy(enemy)
-        enemies.clear()
-        power_up_display.text = "Power-Up Activated!"
-        player_score += 50 * enemies_alive
-        score_display.text = f"Score: {player_score}"
-
 # Update enemy behavior and player status
-last_damage_time = time.time()
-
 def update():
-    global player_health, enemies, bullets, ammo_boxes, enemies_alive, current_wave, player_score, last_damage_time
+    global player_health, enemies, bullets, enemies_alive, current_wave, player_score
 
     # Enemy AI: Move toward the player
     for enemy in enemies:
@@ -135,9 +92,8 @@ def update():
             enemy.position += (player.position - enemy.position).normalized() * time.dt * 2
 
         # Check if enemy hits player
-        if distance(enemy, player) < 1.5 and time.time() - last_damage_time > damage_cooldown:
+        if distance(enemy, player) < 1.5:
             player_health -= 1
-            last_damage_time = time.time()
             health_display.text = f"Health: {player_health}"
             if player_health <= 0:
                 Text("Game Over!", scale=3, origin=(0, 0), background=True)
@@ -162,25 +118,23 @@ def update():
                     application.pause()
             destroy(bullet)
 
-    # Check if player touches an ammo box
-    for ammo_box in ammo_boxes:
-        if distance(ammo_box, player) < 2:
-            ammo_count += 5
-            ammo_display.text = f"Ammo: {ammo_count}"
-            destroy(ammo_box)
-            ammo_boxes.remove(ammo_box)
+    # Check if the player collides with a healing box
+    for healing_box in healing_boxes:
+        if distance(healing_box, player) < 1.5:
+            global player_health
+            player_health += healing_amount
+            player_health = min(player_health, 100)  # Cap health at 100
+            health_display.text = f"Health: {player_health}"
+            healing_boxes.remove(healing_box)
+            destroy(healing_box)
 
 # Input handling
 def input(key):
-    if key == 'shift':  # Use Shift to shoot
-        print("Attempting to shoot...")
+    if key == 'shift':  # Press 'Shift' to shoot
         shoot()
     elif key == 'r':  # Press 'R' to reload
         reload()
-    elif key == 'p':  # Press 'P' to activate power-up
-        activate_power_up()
     elif key == 'escape':  # Press 'ESC' to quit
-        print("Quitting game...")
         application.quit()
 
 # Run the game
