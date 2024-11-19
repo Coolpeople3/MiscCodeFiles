@@ -19,7 +19,7 @@ power_up_cost = 20
 damage_cooldown = 0.5  # Time between consecutive damage
 
 # Setup the game world
-ground = Entity(model='plane', scale=(50, 1, 50), texture='white_cube', texture_scale=(50, 50), collider='box')
+ground = Entity(model='plane', scale=(100, 1, 100), texture='white_cube', texture_scale=(100, 100), collider='box')
 Sky(texture='sky_default')
 
 # Player setup
@@ -37,8 +37,8 @@ def spawn_enemies(wave):
     global enemies, enemies_alive
     enemies_alive = wave * 5  # More enemies per wave
     for _ in range(enemies_alive):
-        x = random.randint(-10, 10)
-        z = random.randint(5, 25)
+        x = random.randint(-40, 40)
+        z = random.randint(-40, 40)
         enemy = Entity(model='cube', color=color.yellow, position=(x, 1, z), collider='box', scale=1.5)
         enemies.append(enemy)
 
@@ -47,8 +47,8 @@ spawn_enemies(current_wave)
 # Ammo Box setup
 def spawn_ammo_box():
     """Spawns a hovering ammo box at a random location."""
-    x = random.randint(-10, 10)
-    z = random.randint(-10, 10)
+    x = random.randint(-40, 40)
+    z = random.randint(-40, 40)
     ammo_box = Entity(
         model='cube',
         color=color.green,
@@ -61,15 +61,31 @@ def spawn_ammo_box():
     ammo_boxes.append(ammo_box)
 
 # Spawn some initial ammo boxes
-for _ in range(3):
+for _ in range(5):
     spawn_ammo_box()
+
+# Structures: Houses and Walls
+def create_houses_and_walls():
+    """Create random houses and walls in the game area."""
+    for _ in range(10):
+        # Create houses
+        x = random.randint(-40, 40)
+        z = random.randint(-40, 40)
+        house = Entity(model='cube', color=color.gray, position=(x, 2, z), scale=(4, 4, 4), collider='box')
+
+    for _ in range(20):
+        # Create walls
+        x = random.randint(-40, 40)
+        z = random.randint(-40, 40)
+        wall = Entity(model='cube', color=color.brown, position=(x, 1.5, z), scale=(6, 3, 0.5), collider='box')
+
+create_houses_and_walls()
 
 # Shooting mechanics
 def shoot():
     global ammo_count, bullets
     if ammo_count > 0:
         try:
-            # Create the bullet using the global camera object
             bullet = Entity(
                 model='sphere',
                 color=color.red,
@@ -77,13 +93,11 @@ def shoot():
                 position=camera.world_position + camera.forward * 2,  # Use global `camera`
                 collider='box',
             )
-            # Animate the bullet's movement
             bullet.animate_position(bullet.position + (camera.forward * 20), duration=1, curve=curve.linear)
             bullets.append(bullet)
             ammo_count -= 1
             ammo_display.text = f"Ammo: {ammo_count}"
 
-            # Schedule destruction of the bullet
             destroy(bullet, delay=1.5)
         except Exception as e:
             print(f"Error in shoot function: {e}")
