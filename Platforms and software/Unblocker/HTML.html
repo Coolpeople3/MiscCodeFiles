@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Browser</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    #urlInput {
+      width: 60%;
+      padding: 10px;
+      margin: 20px 0;
+      font-size: 16px;
+    }
+    #navigateButton {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #1e90ff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    iframe {
+      width: 100%;
+      height: 90vh;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Web Browser</h1>
+  <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://www.google.com)" />
+  <button id="navigateButton">Go</button>
+  <iframe id="browserFrame"></iframe>
+
+  <script>
+    const urlInput = document.getElementById('urlInput');
+    const navigateButton = document.getElementById('navigateButton');
+    const browserFrame = document.getElementById('browserFrame');
+
+    navigateButton.addEventListener('click', () => {
+      let url = urlInput.value.trim();
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url; // Add https:// if not provided
+      }
+      browserFrame.src = url;
+    });
+  </script>
+</body>
+</html>
