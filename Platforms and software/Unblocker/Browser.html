@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Browser</title>
+  <title>Hitarth's Unblocking Browser</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -17,7 +17,7 @@
       margin: 20px 0;
       font-size: 16px;
     }
-    #navigateButton {
+    #openButton {
       padding: 10px 20px;
       font-size: 16px;
       background-color: #1e90ff;
@@ -26,30 +26,24 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    iframe {
-      width: 100%;
-      height: 90vh;
-      border: none;
-    }
   </style>
 </head>
 <body>
-  <h1>Simple Web Browser</h1>
-  <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://www.google.com)" />
-  <button id="navigateButton">Go</button>
-  <iframe id="browserFrame"></iframe>
+  <h1>Hitarth's Unblocking Browser</h1>
+  <p>Enter a URL below and click "Open" to navigate to it.</p>
+  <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://www.example.com)" />
+  <button id="openButton">Open</button>
 
   <script>
+    const openButton = document.getElementById('openButton');
     const urlInput = document.getElementById('urlInput');
-    const navigateButton = document.getElementById('navigateButton');
-    const browserFrame = document.getElementById('browserFrame');
 
-    navigateButton.addEventListener('click', () => {
+    openButton.addEventListener('click', () => {
       let url = urlInput.value.trim();
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url; // Add https:// if not provided
+        url = 'https://' + url; // Ensure https:// prefix
       }
-      browserFrame.src = url;
+      window.open(url, '_blank'); // Open URL in a new tab
     });
   </script>
 </body>
