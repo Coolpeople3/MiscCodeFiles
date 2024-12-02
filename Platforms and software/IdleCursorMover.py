@@ -17,7 +17,7 @@ def move_cursor_smoothly():
             # Move left
             for x in range(end_x, start_x, -5):  # Decrement cursor position in steps
                 pyautogui.moveTo(x, y)
-                time.sleep(0.01)  # Short delay for smooth movement
+                time.sleep(0.001)  # Short delay for smooth movement
 
     except KeyboardInterrupt:
         print("Movement stopped by user.")
