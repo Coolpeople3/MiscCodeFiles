@@ -12,7 +12,7 @@ def move_cursor_smoothly():
             # Move right
             for x in range(start_x, end_x, 5):  # Increment cursor position in steps
                 pyautogui.moveTo(x, y)
-                time.sleep(0.01)  # Short delay for smooth movement
+                time.sleep(0.001)  # Short delay for smooth movement
 
             # Move left
             for x in range(end_x, start_x, -5):  # Decrement cursor position in steps
