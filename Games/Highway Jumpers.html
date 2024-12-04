@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Road Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // Scene, Camera, Renderer
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Variables
+  const laneWidth = 5;
+  const lanes = [-laneWidth, 0, laneWidth];
+  let currentLane = 1;
+  let obstacles = [];
+  let speed = 0.1;
+  let score = 0;
+  let gameRunning = true;
+
+  // Ball
+  const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+  const ballMaterial = new THREE.MeshStandardMaterial({ color: 0x00ffff });
+  const ball = new THREE.Mesh(ballGeometry, ballMaterial);
+  ball.position.set(0, 0.5, 3); // Lowered the ball on the screen
+  scene.add(ball);
+
+  // Road: Make it longer and scale to fit the screen bottom
+  const roadGeometry = new THREE.PlaneGeometry(15, 3000, 32); // Increased road length
+  const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide });
+  const road = new THREE.Mesh(roadGeometry, roadMaterial);
+  road.rotation.x = -Math.PI / 2;
+  road.position.z = -500; // Positioned further back
+  scene.add(road);
+
+  // Obstacles
+  const obstacleGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const obstacleMaterial = new THREE.MeshStandardMaterial({ color: 0xff003c });
+
+  function addObstacle() {
+    const lane = lanes[Math.floor(Math.random() * lanes.length)];
+    const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
+    obstacle.position.set(lane, 0.5, -100);
+    obstacles.push(obstacle);
+    scene.add(obstacle);
+  }
+
+  function updateObstacles() {
+    obstacles.forEach((obstacle, index) => {
+      obstacle.position.z += speed * 5;
+      if (obstacle.position.z > camera.position.z) {
+        scene.remove(obstacle);
+        obstacles.splice(index, 1);
+      }
+    });
+
+    // Add new obstacles randomly
+    if (Math.random() < 0.02) addObstacle();
+  }
+
+  // Lights
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+  scene.add(ambientLight);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  directionalLight.position.set(0, 10, 10);
+  scene.add(directionalLight);
+
+  // Controls
+  function moveLeft() {
+    if (currentLane > 0) currentLane--;
+  }
+  function moveRight() {
+    if (currentLane < lanes.length - 1) currentLane++;
+  }
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') moveLeft();
+    if (e.key === 'ArrowRight') moveRight();
+  });
+
+  // Score Display
+  const scoreDisplay = document.createElement('div');
+  scoreDisplay.style.position = 'absolute';
+  scoreDisplay.style.top = '10px';
+  scoreDisplay.style.left = '10px';
+  scoreDisplay.style.color = '#fff';
+  scoreDisplay.style.fontFamily = 'Arial, sans-serif';
+  scoreDisplay.style.fontSize = '20px';
+  document.body.appendChild(scoreDisplay);
+
+  // Game Loop
+  function animate() {
+    if (!gameRunning) return;
+
+    requestAnimationFrame(animate);
+
+    // Update ball position
+    ball.position.x = lanes[currentLane];
+
+    // Update obstacles
+    updateObstacles();
+
+    // Collision detection
+    obstacles.forEach((obstacle) => {
+      if (
+        Math.abs(obstacle.position.z - ball.position.z) < 1 &&
+        Math.abs(obstacle.position.x - ball.position.x) < 1
+      ) {
+        gameRunning = false;
+        alert(`Game Over! Final Score: ${score}`);
+        location.reload();
+      }
+    });
+
+    // Update score
+    score += 1;
+    scoreDisplay.textContent = `Score: ${Math.floor(score / 10)}`;
+
+    // Render
+    renderer.render(scene, camera);
+  }
+
+  // Initial Setup
+  camera.position.set(0, 4, 10); // Adjusted for a closer view
+  camera.lookAt(ball.position);
+  animate();
+</script>
+</body>
+</html>
