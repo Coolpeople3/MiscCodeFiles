@@ -68,26 +68,26 @@
   scene.add(road);
 
   // Dotted Lane Lines
-  function addLaneLines() {
+  function createDottedLine(xOffset) {
     const lineMaterial = new THREE.LineDashedMaterial({
       color: 0xffffff,
-      dashSize: 2,
-      gapSize: 2,
+      dashSize: 5,
+      gapSize: 5,
     });
 
-    for (let i = -1; i <= 1; i += 2) { // Adds 2 dotted lines between 3 lanes
-      const lineGeometry = new THREE.BufferGeometry();
-      const points = [
-        new THREE.Vector3(i * laneWidth / 2, 0.01, -1500), // Start point
-        new THREE.Vector3(i * laneWidth / 2, 0.01, 1500),  // End point
-      ];
-      lineGeometry.setFromPoints(points);
-      const line = new THREE.Line(lineGeometry, lineMaterial);
-      line.computeLineDistances(); // Required for dashed lines to render
-      scene.add(line);
+    const lineGeometry = new THREE.BufferGeometry();
+    const points = [];
+    for (let z = -1500; z <= 1500; z += 10) {
+      points.push(new THREE.Vector3(xOffset, 0.01, z));
     }
+    lineGeometry.setFromPoints(points);
+    lineGeometry.computeLineDistances();
+    const line = new THREE.Line(lineGeometry, lineMaterial);
+    scene.add(line);
   }
-  addLaneLines();
+
+  createDottedLine(-laneWidth / 2);
+  createDottedLine(laneWidth / 2);
 
   // Obstacles
   const obstacleGeometry = new THREE.BoxGeometry(1, 1, 1);
