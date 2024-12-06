@@ -41,16 +41,12 @@
   // Constants
   const laneWidth = 5;
   const lanes = [-laneWidth, 0, laneWidth];
-  const gravity = -0.03;
   let currentLane = 1;
   let targetLane = lanes[currentLane];
   let obstacles = [];
-  let bigObstacles = [];
   let speed = 0.1;
   let score = 0;
   let gameRunning = true;
-  let jumpVelocity = 0;
-  let isJumping = false;
 
   // Ball (Character)
   const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
@@ -69,7 +65,6 @@
 
   // Dotted Lane Lines
   const laneLines = [];
-
   function createDottedLine(xOffset) {
     const lineMaterial = new THREE.LineDashedMaterial({
       color: 0xffffff,
@@ -96,23 +91,12 @@
   const obstacleGeometry = new THREE.BoxGeometry(1, 1, 1);
   const obstacleMaterial = new THREE.MeshStandardMaterial({ color: 0xff003c });
 
-  const bigObstacleGeometry = new THREE.BoxGeometry(2, 2, 2);
-  const bigObstacleMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 });
-
-  function addSmallObstacle() {
+  function addObstacle() {
     const lane = lanes[Math.floor(Math.random() * lanes.length)];
     const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
     obstacle.position.set(lane, 0.5, -100);
     obstacles.push(obstacle);
     scene.add(obstacle);
-  }
-
-  function addBigObstacle() {
-    const lane = lanes[Math.floor(Math.random() * lanes.length)];
-    const bigObstacle = new THREE.Mesh(bigObstacleGeometry, bigObstacleMaterial);
-    bigObstacle.position.set(lane, 1, -120);
-    bigObstacles.push(bigObstacle);
-    scene.add(bigObstacle);
   }
 
   function updateObstacles() {
@@ -124,16 +108,8 @@
       }
     });
 
-    bigObstacles.forEach((bigObstacle, index) => {
-      bigObstacle.position.z += speed * 5;
-      if (bigObstacle.position.z > camera.position.z) {
-        scene.remove(bigObstacle);
-        bigObstacles.splice(index, 1);
-      }
-    });
-
-    if (Math.random() < 0.02) addSmallObstacle();
-    if (Math.random() < 0.01) addBigObstacle();
+    // Add new obstacles randomly
+    if (Math.random() < 0.02) addObstacle();
   }
 
   // Lights
@@ -156,16 +132,10 @@
       targetLane = lanes[currentLane];
     }
   }
-  function jump() {
-    if (!isJumping) {
-      isJumping = true;
-      jumpVelocity = 0.35;
-    }
-  }
+
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') moveLeft();
     if (e.key === 'ArrowRight') moveRight();
-    if (e.key === 'ArrowUp') jump();
   });
 
   // Score Display
@@ -180,22 +150,14 @@
     // Smooth lane switching
     ball.position.x += (targetLane - ball.position.x) * 0.1;
 
-    // Jumping logic
-    if (isJumping) {
-      ball.position.y += jumpVelocity;
-      jumpVelocity += gravity;
-      if (ball.position.y <= 0.5) {
-        ball.position.y = 0.5;
-        isJumping = false;
-      }
-    }
-
     // Camera follows ball horizontally
     camera.position.x = ball.position.x;
     camera.lookAt(ball.position.x, ball.position.y, ball.position.z - 10);
 
-    // Update obstacles and lane lines
+    // Update obstacles
     updateObstacles();
+
+    // Update lane lines position to create the illusion of movement
     laneLines.forEach(line => {
       line.position.z += speed * 5; // Move the lines with the obstacles
       if (line.position.z > camera.position.z) {
@@ -207,17 +169,7 @@
     obstacles.forEach((obstacle) => {
       if (
         Math.abs(obstacle.position.z - ball.position.z) < 1 &&
-        Math.abs(obstacle.position.x - ball.position.x) < 1 &&
-        ball.position.y < 1
-      ) {
-        gameOver();
-      }
-    });
-
-    bigObstacles.forEach((bigObstacle) => {
-      if (
-        Math.abs(bigObstacle.position.z - ball.position.z) < 1 &&
-        Math.abs(bigObstacle.position.x - ball.position.x) < 1
+        Math.abs(obstacle.position.x - ball.position.x) < 1
       ) {
         gameOver();
       }
