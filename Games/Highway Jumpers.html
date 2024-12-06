@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Highway Jumpers By Hitarth</title>
+  <title>3D Road Game</title>
   <style>
     body {
       margin: 0;
@@ -41,7 +41,7 @@
   // Constants
   const laneWidth = 5;
   const lanes = [-laneWidth, 0, laneWidth];
-  const gravity = -0.03; // Increased gravity for smoother jump
+  const gravity = -0.03;
   let currentLane = 1;
   let obstacles = [];
   let bigObstacles = [];
@@ -66,10 +66,27 @@
   road.position.z = -500;
   scene.add(road);
 
+  // Lane Lines
+  function addLaneLines() {
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+    for (let i = -2; i <= 2; i++) {
+      if (i === 0) continue; // Skip the middle lane
+      const lineGeometry = new THREE.BufferGeometry();
+      const points = [
+        new THREE.Vector3(i * laneWidth, 0.01, -1500), // Start point
+        new THREE.Vector3(i * laneWidth, 0.01, 1500),  // End point
+      ];
+      lineGeometry.setFromPoints(points);
+      const line = new THREE.Line(lineGeometry, lineMaterial);
+      scene.add(line);
+    }
+  }
+  addLaneLines();
+
   // Obstacles
   const obstacleGeometry = new THREE.BoxGeometry(1, 1, 1);
   const obstacleMaterial = new THREE.MeshStandardMaterial({ color: 0xff003c });
-  
+
   const bigObstacleGeometry = new THREE.BoxGeometry(2, 2, 2);
   const bigObstacleMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 });
 
@@ -106,7 +123,6 @@
       }
     });
 
-    // Randomly spawn obstacles
     if (Math.random() < 0.02) addSmallObstacle();
     if (Math.random() < 0.01) addBigObstacle();
   }
@@ -128,13 +144,13 @@
   function jump() {
     if (!isJumping) {
       isJumping = true;
-      jumpVelocity = 0.35; // Higher initial velocity for a bigger jump
+      jumpVelocity = 0.35;
     }
   }
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') moveLeft();
     if (e.key === 'ArrowRight') moveRight();
-    if (e.key === 'ArrowUp') jump(); // Jump with the up arrow key
+    if (e.key === 'ArrowUp') jump();
   });
 
   // Score Display
@@ -150,12 +166,16 @@
     ball.position.x = lanes[currentLane];
     if (isJumping) {
       ball.position.y += jumpVelocity;
-      jumpVelocity += gravity; // Gravity decreases upward velocity
+      jumpVelocity += gravity;
       if (ball.position.y <= 0.5) {
-        ball.position.y = 0.5; // Reset to ground level
+        ball.position.y = 0.5;
         isJumping = false;
       }
     }
+
+    // Camera follows ball horizontally
+    camera.position.x = ball.position.x;
+    camera.lookAt(ball.position.x, ball.position.y, ball.position.z - 10);
 
     // Update obstacles
     updateObstacles();
