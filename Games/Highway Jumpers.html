@@ -128,13 +128,13 @@
   function jump() {
     if (!isJumping) {
       isJumping = true;
-      jumpVelocity = 0.2;
+      jumpVelocity = 1;
     }
   }
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') moveLeft();
     if (e.key === 'ArrowRight') moveRight();
-    if (e.key === ' ') jump();
+    if (e.key === 'ArrowUp') jump();
   });
 
   // Score Display
