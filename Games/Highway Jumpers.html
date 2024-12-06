@@ -43,6 +43,7 @@
   const lanes = [-laneWidth, 0, laneWidth];
   const gravity = -0.03;
   let currentLane = 1;
+  let targetLane = lanes[currentLane];
   let obstacles = [];
   let bigObstacles = [];
   let speed = 0.1;
@@ -136,10 +137,16 @@
 
   // Controls
   function moveLeft() {
-    if (currentLane > 0) currentLane--;
+    if (currentLane > 0) {
+      currentLane--;
+      targetLane = lanes[currentLane];
+    }
   }
   function moveRight() {
-    if (currentLane < lanes.length - 1) currentLane++;
+    if (currentLane < lanes.length - 1) {
+      currentLane++;
+      targetLane = lanes[currentLane];
+    }
   }
   function jump() {
     if (!isJumping) {
@@ -162,8 +169,10 @@
 
     requestAnimationFrame(animate);
 
-    // Ball movement
-    ball.position.x = lanes[currentLane];
+    // Smooth lane switching
+    ball.position.x += (targetLane - ball.position.x) * 0.1;
+
+    // Jumping logic
     if (isJumping) {
       ball.position.y += jumpVelocity;
       jumpVelocity += gravity;
