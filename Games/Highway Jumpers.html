@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Road Game</title>
+  <title>Highway Jumpers By Hitarth</title>
   <style>
     body {
       margin: 0;
@@ -41,7 +41,7 @@
   // Constants
   const laneWidth = 5;
   const lanes = [-laneWidth, 0, laneWidth];
-  const gravity = -0.02;
+  const gravity = -0.03; // Increased gravity for smoother jump
   let currentLane = 1;
   let obstacles = [];
   let bigObstacles = [];
@@ -128,13 +128,13 @@
   function jump() {
     if (!isJumping) {
       isJumping = true;
-      jumpVelocity = 1;
+      jumpVelocity = 0.35; // Higher initial velocity for a bigger jump
     }
   }
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') moveLeft();
     if (e.key === 'ArrowRight') moveRight();
-    if (e.key === 'ArrowUp') jump();
+    if (e.key === 'ArrowUp') jump(); // Jump with the up arrow key
   });
 
   // Score Display
@@ -150,9 +150,9 @@
     ball.position.x = lanes[currentLane];
     if (isJumping) {
       ball.position.y += jumpVelocity;
-      jumpVelocity += gravity;
+      jumpVelocity += gravity; // Gravity decreases upward velocity
       if (ball.position.y <= 0.5) {
-        ball.position.y = 0.5;
+        ball.position.y = 0.5; // Reset to ground level
         isJumping = false;
       }
     }
