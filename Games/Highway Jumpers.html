@@ -12,9 +12,23 @@
     canvas {
       display: block;
     }
+    #score-display {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
+<div id="score-display">Score: 0</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
   // Scene, Camera, Renderer
@@ -24,36 +38,42 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // Variables
+  // Constants
   const laneWidth = 5;
   const lanes = [-laneWidth, 0, laneWidth];
+  const gravity = -0.02;
   let currentLane = 1;
   let obstacles = [];
+  let bigObstacles = [];
   let speed = 0.1;
   let score = 0;
   let gameRunning = true;
-  let BigObstacles = [];
+  let jumpVelocity = 0;
+  let isJumping = false;
 
-  // Ball
+  // Ball (Character)
   const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
   const ballMaterial = new THREE.MeshStandardMaterial({ color: 0x00ffff });
   const ball = new THREE.Mesh(ballGeometry, ballMaterial);
-  ball.position.set(0, 0.5, 3); // Lowered the ball on the screen
+  ball.position.set(0, 0.5, 3);
   scene.add(ball);
 
-  // Road: Make it longer and scale to fit the screen bottom
-  const roadGeometry = new THREE.PlaneGeometry(15, 3000, 32); // Increased road length
+  // Road
+  const roadGeometry = new THREE.PlaneGeometry(15, 3000, 32);
   const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide });
   const road = new THREE.Mesh(roadGeometry, roadMaterial);
   road.rotation.x = -Math.PI / 2;
-  road.position.z = -500; // Positioned further back
+  road.position.z = -500;
   scene.add(road);
 
   // Obstacles
   const obstacleGeometry = new THREE.BoxGeometry(1, 1, 1);
   const obstacleMaterial = new THREE.MeshStandardMaterial({ color: 0xff003c });
+  
+  const bigObstacleGeometry = new THREE.BoxGeometry(2, 2, 2);
+  const bigObstacleMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 });
 
-  function addObstacle() {
+  function addSmallObstacle() {
     const lane = lanes[Math.floor(Math.random() * lanes.length)];
     const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
     obstacle.position.set(lane, 0.5, -100);
@@ -61,14 +81,14 @@
     scene.add(obstacle);
   }
 
-function addBigObstacle() {
+  function addBigObstacle() {
     const lane = lanes[Math.floor(Math.random() * lanes.length)];
-    const BigObstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
-    obstacle.position.set(lane, 0.5, -100);
-    obstacles.push(obstacle);
-    scene.add(obstacle);
+    const bigObstacle = new THREE.Mesh(bigObstacleGeometry, bigObstacleMaterial);
+    bigObstacle.position.set(lane, 1, -120);
+    bigObstacles.push(bigObstacle);
+    scene.add(bigObstacle);
   }
-  
+
   function updateObstacles() {
     obstacles.forEach((obstacle, index) => {
       obstacle.position.z += speed * 5;
@@ -78,24 +98,19 @@ function addBigObstacle() {
       }
     });
 
-    // Add new obstacles randomly
-    if (Math.random() < 0.02) addObstacle();
-  }
-
-
-function updateBigObstacles() {
-    obstacles.forEach((BigObstacle, index) => {
-      obstacle.position.z += speed * 5;
-      if (obstacle.position.z > camera.position.z) {
-        scene.remove(obstacle);
-        obstacles.splice(index, 1);
+    bigObstacles.forEach((bigObstacle, index) => {
+      bigObstacle.position.z += speed * 5;
+      if (bigObstacle.position.z > camera.position.z) {
+        scene.remove(bigObstacle);
+        bigObstacles.splice(index, 1);
       }
     });
 
-    // Add new obstacles randomly
-    if (Math.random() < 0.02) addBigObstacle();
+    // Randomly spawn obstacles
+    if (Math.random() < 0.02) addSmallObstacle();
+    if (Math.random() < 0.01) addBigObstacle();
   }
-  
+
   // Lights
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
   scene.add(ambientLight);
@@ -110,20 +125,20 @@ function updateBigObstacles() {
   function moveRight() {
     if (currentLane < lanes.length - 1) currentLane++;
   }
+  function jump() {
+    if (!isJumping) {
+      isJumping = true;
+      jumpVelocity = 0.2;
+    }
+  }
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') moveLeft();
     if (e.key === 'ArrowRight') moveRight();
+    if (e.key === ' ') jump();
   });
 
   // Score Display
-  const scoreDisplay = document.createElement('div');
-  scoreDisplay.style.position = 'absolute';
-  scoreDisplay.style.top = '10px';
-  scoreDisplay.style.left = '10px';
-  scoreDisplay.style.color = '#fff';
-  scoreDisplay.style.fontFamily = 'Arial, sans-serif';
-  scoreDisplay.style.fontSize = '20px';
-  document.body.appendChild(scoreDisplay);
+  const scoreDisplay = document.getElementById('score-display');
 
   // Game Loop
   function animate() {
@@ -131,8 +146,16 @@ function updateBigObstacles() {
 
     requestAnimationFrame(animate);
 
-    // Update ball position
+    // Ball movement
     ball.position.x = lanes[currentLane];
+    if (isJumping) {
+      ball.position.y += jumpVelocity;
+      jumpVelocity += gravity;
+      if (ball.position.y <= 0.5) {
+        ball.position.y = 0.5;
+        isJumping = false;
+      }
+    }
 
     // Update obstacles
     updateObstacles();
@@ -141,11 +164,19 @@ function updateBigObstacles() {
     obstacles.forEach((obstacle) => {
       if (
         Math.abs(obstacle.position.z - ball.position.z) < 1 &&
-        Math.abs(obstacle.position.x - ball.position.x) < 1
+        Math.abs(obstacle.position.x - ball.position.x) < 1 &&
+        ball.position.y < 1
       ) {
-        gameRunning = false;
-        alert(`Game Over! Final Score: ${score}`);
-        location.reload();
+        gameOver();
+      }
+    });
+
+    bigObstacles.forEach((bigObstacle) => {
+      if (
+        Math.abs(bigObstacle.position.z - ball.position.z) < 1 &&
+        Math.abs(bigObstacle.position.x - ball.position.x) < 1
+      ) {
+        gameOver();
       }
     });
 
@@ -157,8 +188,14 @@ function updateBigObstacles() {
     renderer.render(scene, camera);
   }
 
+  function gameOver() {
+    gameRunning = false;
+    alert(`Game Over! Final Score: ${Math.floor(score / 10)}`);
+    location.reload();
+  }
+
   // Initial Setup
-  camera.position.set(0, 4, 10); // Adjusted for a closer view
+  camera.position.set(0, 4, 10);
   camera.lookAt(ball.position);
   animate();
 </script>
