@@ -32,6 +32,7 @@
   let speed = 0.1;
   let score = 0;
   let gameRunning = true;
+  let BigObstacles = [];
 
   // Ball
   const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
@@ -60,6 +61,14 @@
     scene.add(obstacle);
   }
 
+function addBigObstacle() {
+    const lane = lanes[Math.floor(Math.random() * lanes.length)];
+    const BigObstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
+    obstacle.position.set(lane, 0.5, -100);
+    obstacles.push(obstacle);
+    scene.add(obstacle);
+  }
+  
   function updateObstacles() {
     obstacles.forEach((obstacle, index) => {
       obstacle.position.z += speed * 5;
@@ -73,6 +82,20 @@
     if (Math.random() < 0.02) addObstacle();
   }
 
+
+function updateBigObstacles() {
+    obstacles.forEach((BigObstacle, index) => {
+      obstacle.position.z += speed * 5;
+      if (obstacle.position.z > camera.position.z) {
+        scene.remove(obstacle);
+        obstacles.splice(index, 1);
+      }
+    });
+
+    // Add new obstacles randomly
+    if (Math.random() < 0.02) addBigObstacle();
+  }
+  
   // Lights
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
   scene.add(ambientLight);
