@@ -68,6 +68,8 @@
   scene.add(road);
 
   // Dotted Lane Lines
+  const laneLines = [];
+
   function createDottedLine(xOffset) {
     const lineMaterial = new THREE.LineDashedMaterial({
       color: 0xffffff,
@@ -84,6 +86,7 @@
     lineGeometry.computeLineDistances();
     const line = new THREE.Line(lineGeometry, lineMaterial);
     scene.add(line);
+    laneLines.push(line);
   }
 
   createDottedLine(-laneWidth / 2);
@@ -191,8 +194,14 @@
     camera.position.x = ball.position.x;
     camera.lookAt(ball.position.x, ball.position.y, ball.position.z - 10);
 
-    // Update obstacles
+    // Update obstacles and lane lines
     updateObstacles();
+    laneLines.forEach(line => {
+      line.position.z += speed * 5; // Move the lines with the obstacles
+      if (line.position.z > camera.position.z) {
+        line.position.z -= 3000; // Reset position to simulate continuous movement
+      }
+    });
 
     // Collision detection
     obstacles.forEach((obstacle) => {
