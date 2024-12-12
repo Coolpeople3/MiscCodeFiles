@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Input Example</title>
+    <style>
+        /* Centering the content on the screen */
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        /* Container for the input area and output area */
+        #input-area, #output-area {
+            text-align: center;
+            width: 100%;
+            max-width: 600px; /* Limit the width for better readability */
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-container {
+            margin-bottom: 10px;
+        }
+
+        #buttons {
+            margin-top: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #output-area {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="input-area">
+        <div class="input-container">
+            <textarea rows="4" cols="50" placeholder="Enter text here..."></textarea>
+        </div>
+        <div id="buttons">
+            <button id="moreTextBtn">More text</button>
+            <button id="finishedBtn">Finished</button>
+        </div>
+    </div>
+
+    <div id="output-area">
+        <div id="text-display"></div>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <script>
+        const inputArea = document.getElementById('input-area');
+        const buttons = document.getElementById('buttons');
+        const moreTextBtn = document.getElementById('moreTextBtn');
+        const finishedBtn = document.getElementById('finishedBtn');
+        const outputArea = document.getElementById('output-area');
+        const textDisplay = document.getElementById('text-display');
+        const nextBtn = document.getElementById('nextBtn');
+        let textAreas = [];
+        let currentIndex = 0;
+
+        // Handle the "More text" button click
+        moreTextBtn.addEventListener('click', function() {
+            const newTextAreaContainer = document.createElement('div');
+            newTextAreaContainer.classList.add('input-container');
+            
+            const newTextArea = document.createElement('textarea');
+            newTextArea.rows = 4;
+            newTextArea.cols = 50;
+            newTextArea.placeholder = 'Enter text here...';
+            
+            newTextAreaContainer.appendChild(newTextArea);
+            inputArea.insertBefore(newTextAreaContainer, buttons);
+            textAreas.push(newTextArea);
+            inputArea.appendChild(buttons);  // Move buttons down after adding new input area
+        });
+
+        // Handle the "Finished" button click
+        finishedBtn.addEventListener('click', function() {
+            // Hide the input areas
+            inputArea.style.display = 'none';
+            
+            // Show the output area and display the first text
+            outputArea.style.display = 'block';
+            textDisplay.innerText = textAreas[0].value;
+
+            // Reset the index to show the first text
+            currentIndex = 0;
+        });
+
+        // Handle the "Next" button click
+        nextBtn.addEventListener('click', function() {
+            currentIndex = (currentIndex + 1) % textAreas.length;
+            textDisplay.innerText = textAreas[currentIndex].value;
+        });
+    </script>
+
+</body>
+</html>
