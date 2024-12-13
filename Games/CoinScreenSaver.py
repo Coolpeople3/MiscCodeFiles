@@ -25,12 +25,13 @@ make_window_transparent(hwnd)
 
 # Create the coin
 coin = tk.Label(root, text="💰", font=("Arial", 30), bg="white")
-coin.place(x=0, y=0)
+coin.place(x=-100, y=-100)  # Start off-screen
 
 # Animation variables
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
+# Function to move the coin across the screen
 def move_coin():
     # Random start position
     y_pos = random.randint(0, screen_height - 50)
@@ -43,14 +44,7 @@ def move_coin():
         root.after(20)  # Adjust speed
     
     # Hide coin after it leaves the screen
-    coin.place_forget()
-
-# Start the coin movement at random intervals
-def random_coin_spawner():
-    while True:
-        root.after(random.randint(5000, 15000), move_coin)  # Random 5-15 sec
-        root.update_idletasks()
-        root.update()
+    coin.place(x=-100, y=-100)
 
 # Function to trigger a coin manually
 def spawn_coin():
@@ -65,9 +59,18 @@ def hotkey_listener():
             while keyboard.is_pressed('q') or keyboard.is_pressed('p'):
                 pass
 
+# Function to spawn coins at random intervals
+def random_coin_spawner():
+    def spawn():
+        spawn_coin()
+        root.after(random.randint(5000, 15000), spawn)  # Schedule next coin
+    spawn()  # Start the first spawn
+
 # Start the hotkey listener in a separate thread
 threading.Thread(target=hotkey_listener, daemon=True).start()
 
-# Run the spawner
+# Start the random coin spawner
 root.after(0, random_coin_spawner)
+
+# Run the Tkinter event loop
 root.mainloop()
