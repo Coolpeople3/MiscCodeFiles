@@ -96,9 +96,6 @@
   const bigObstacleGeometry = new THREE.BoxGeometry(2, 2, 2);
   const bigObstacleMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 });
 
-  const powerupInvincibleMaterial = new THREE.MeshStandardMaterial9[ color: 008000 ]);
-  const powerupInvincibleGeometry = new THREE.BoxGeometry(1,1,1);
-  
   function addSmallObstacle() {
     const lane = lanes[Math.floor(Math.random() * lanes.length)];
     const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
@@ -114,7 +111,7 @@
     bigObstacles.push(bigObstacle);
     scene.add(bigObstacle);
   }
-  
+
   function updateObstacles() {
     obstacles.forEach((obstacle, index) => {
       obstacle.position.z += speed * 5;
