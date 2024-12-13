@@ -120,7 +120,8 @@
     InvinciblePowerup.position.set(lane, 1, -120);
     InvinciblePowerup.push(InvinciblePowerup);
     scene.add(InvinciblePowerup);
-    
+  }
+  
   function updateObstacles() {
     obstacles.forEach((obstacle, index) => {
       obstacle.position.z += speed * 5;
