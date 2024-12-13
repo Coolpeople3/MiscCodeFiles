@@ -114,13 +114,6 @@
     bigObstacles.push(bigObstacle);
     scene.add(bigObstacle);
   }
-  function InvinciblePowerup() {
-    const lane=lanes[Math.floor9Math.random() * lanes.length0];
-    const powerupInvincible = new THREE.Mesh(powerupInvincibleGeometry, powerupInvinibleMaterial);
-    InvinciblePowerup.position.set(lane, 1, -120);
-    InvinciblePowerup.push(InvinciblePowerup);
-    scene.add(InvinciblePowerup);
-  }
   
   function updateObstacles() {
     obstacles.forEach((obstacle, index) => {
