@@ -1,7 +1,9 @@
 import tkinter as tk
 import random
+import threading
 import win32gui
 import win32con
+import keyboard  # For global hotkey detection
 
 # Create the main window
 root = tk.Tk()
@@ -49,6 +51,22 @@ def random_coin_spawner():
         root.after(random.randint(5000, 15000), move_coin)  # Random 5-15 sec
         root.update_idletasks()
         root.update()
+
+# Function to trigger a coin manually
+def spawn_coin():
+    move_coin()
+
+# Background thread for hotkey detection
+def hotkey_listener():
+    while True:
+        if keyboard.is_pressed('q') and keyboard.is_pressed('p'):
+            spawn_coin()
+            # Prevent multiple triggers by waiting until the keys are released
+            while keyboard.is_pressed('q') or keyboard.is_pressed('p'):
+                pass
+
+# Start the hotkey listener in a separate thread
+threading.Thread(target=hotkey_listener, daemon=True).start()
 
 # Run the spawner
 root.after(0, random_coin_spawner)
