@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charades Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    #word {
+      font-size: 2rem;
+      color: #007acc;
+      margin: 20px 0;
+    }
+    button {
+      background-color: #007acc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #005f99;
+    }
+  </style>
+</head>
+<body>
+  <h1>Charades Game</h1>
+  <p>Act out the word below and let your friends guess!</p>
+  <div id="word">Press "Next Word" to start!</div>
+  <button onclick="showNextWord()">Next Word</button>
+
+  <script>
+    const words = [
+      "elephant", "jump", "run", "dance", "pizza", "sunshine", "guitar", 
+      "football", "superhero", "computer", "banana", "singing", "basketball", 
+      "camera", "teacher", "doctor", "apple", "butterfly", "climbing", "swimming", 
+      "laughing", "crying", "typing", "cooking", "sneezing", "dog", "cat", 
+      "zebra", "kite", "monkey", "tiger", "robot", "dragon", "queen", "king", 
+      "pilot", "astronaut", "scientist", "detective", "bird", "cow", "lion", 
+      "wizard", "magic", "typing", "fishing", "skateboarding", "diving", 
+      "eating", "sleeping", "waving"
+      // Add more words as needed
+    ];
+
+    function showNextWord() {
+      const randomIndex = Math.floor(Math.random() * words.length);
+      document.getElementById('word').innerText = words[randomIndex];
+    }
+  </script>
+</body>
+</html>
