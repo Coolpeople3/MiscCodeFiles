@@ -1,21 +1,23 @@
-import cv2
+import cv2   #may need to install library: "pip install opencv-python"
 import time
 
-# Ask user for preferred behavior
+#User input for method :)
+print("Welcome to Hitarth's motion trcking security device!")
 print("Choose your option:")
 print("1. Take one photo and stop.")
 print("2. Take photos with a cooldown period.")
-user_choice = input("Enter 1 or 2: ")
+print("3. Start with a 10-second delay before taking photos with cooldown.")
+user_choice = input("Enter 1, 2, or 3: ")
 
-# Initialize webcam (0 is usually the default camera)
+# start the camera where 0 is the default camera
 cap = cv2.VideoCapture(0)
 
-# Check if the camera opened successfully
+# Checks if the camera opened successfully
 if not cap.isOpened():
     print("Error: Could not access the camera.")
     exit()
 
-# Initialize the first frame for motion comparison
+# Itake the first frame of the scene for motion finding comparison
 ret, prev_frame = cap.read()
 prev_frame = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
 prev_frame = cv2.GaussianBlur(prev_frame, (21, 21), 0)
@@ -25,6 +27,11 @@ last_capture_time = time.time()
 
 # Variable to track whether we've taken a photo already (if user chooses one-time photo)
 photo_taken = False
+
+# If option 3 is selected, wait for 10 seconds before starting motion detection
+if user_choice == "3":
+    print("Starting in 10 seconds... Get ready!")
+    time.sleep(10)
 
 while True:
     # Capture frame-by-frame
@@ -65,7 +72,7 @@ while True:
             photo_taken = True  # Ensure only one photo is taken
             break
 
-        elif user_choice == "2":
+        elif user_choice == "2" or user_choice == "3":
             # For cooldown, check if enough time has passed since the last photo
             current_time = time.time()
             if current_time - last_capture_time > 5:  # Cooldown of 5 seconds (adjust as needed)
