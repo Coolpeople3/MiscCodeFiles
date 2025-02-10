@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open and Reload Tab</title>
+</head>
+<body>
+  <h1>Tab Controller</h1>
+
+  <script>
+    function openAndReload() {
+      // Prompt the user for the URL
+      const url = prompt("Enter the URL to open:", "https://www.google.com");
+
+      if (url) {
+        let newTab = window.open(url, "_blank");
+
+        if (newTab) {
+          setTimeout(() => {
+            newTab.focus();
+
+            let reloadCount = 0;
+            const maxReloads = 300000000000; // Change this value to set reload times
+
+            while (reloadCount < maxReloads) {
+              newTab.location.reload();
+              reloadCount++;
+            }
+
+          }, 3000);
+        } else {
+          alert("Please allow pop-ups to open the tab.");
+        }
+      } else {
+        alert("No URL provided.");
+      }
+    }
+
+    openAndReload();
+  </script>
+</body>
+</html>
